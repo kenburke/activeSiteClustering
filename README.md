@@ -1,4 +1,4 @@
-# HW2 Skeleton
+# Clustering Homework
 
 [![Build
 Status](https://travis-ci.org/kenburke/clustering.svg?branch=master)](https://travis-ci.org/kenburke/clustering)
