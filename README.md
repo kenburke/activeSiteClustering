@@ -3,7 +3,7 @@
 [![Build
 Status](https://travis-ci.org/kenburke/clustering.svg?branch=master)](https://travis-ci.org/kenburke/clustering)
 
-Skeleton for clustering project.
+Clustering homework assignment, with continuous integration testing.
 
 ## assignment
 
