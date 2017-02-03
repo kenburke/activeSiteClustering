@@ -23,7 +23,28 @@ def compute_similarity(site_a, site_b):
             - Fraction of residue TYPES (by polarity/charge) shared            
     """
 
-    
+    polarity = {
+        "GLY": "nonpolar",
+        "ALA": "nonpolar",
+        "VAL": "nonpolar",
+        "ILE": "nonpolar",
+        "LEU": "nonpolar",
+        "MET": "nonpolar",
+        "PHE": "nonpolar",
+        "TYR": "nonpolar",
+        "TRP": "nonpolar",
+        "PRO": "nonpolar",
+        "CYS": "nonpolar"
+        "SER": "polar",
+        "THR": "polar",
+        "ASN": "polar",
+        "GLN": "polar",
+        "ARG": "basic",
+        "HIS": "basic",
+        "LYS": "basic",
+        "ASP": "acidic",
+        "GLU": "acidic",
+        }
     
     
     
