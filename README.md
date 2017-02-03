@@ -33,18 +33,22 @@ The main file that you will need to modify is `cluster.py` and the corresponding
     ├── test_cluster.py
     └── test_io.py
 ```
-
 ## usage
 
-To use the package, first run
+To use the package, first create a conda environment
 
 ```
-conda install --yes --file requirements.txt
+conda create env
 ```
 
-to install all the dependencies in `requirements.txt`. Then the package's
-main function (located in `clustering/__main__.py`) can be run as
-follows
+to install all dependencies outlined in `environment.yml`. Then activate the env
+
+```
+source activate activeSiteClustering
+```
+
+Then the package's main function (located in `clustering/__main__.py`) 
+can be run as follows
 
 ```
 python -m clustering [-P| -H] data test.txt

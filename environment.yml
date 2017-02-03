@@ -1,0 +1,11 @@
+name: activeSiteClustering
+dependencies:
+- python=3.6.0
+- pip
+- anaconda
+- pip:
+    - scipy>=0.18.1
+    - numpy>=1.11.2
+    - pytest>=3.0
+    - matplotlib>=2.0.0
+    - progressbar2>=3.12.0
