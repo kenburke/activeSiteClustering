@@ -1,6 +1,6 @@
 # python of course and we don't need access to sudo atm
 language: python
-sudo: false
+sudo: required
 
 # emails are annoying
 notifications:
