@@ -1,4 +1,8 @@
 from .utils import Atom, Residue, ActiveSite
+import numpy as np
+
+def update_dict(dictionary,keys,values):
+    dictionary.update(dict(zip(keys,values)))
 
 def compute_similarity(site_a, site_b):
     """
@@ -16,14 +20,13 @@ def compute_similarity(site_a, site_b):
             - Mean and Variance of total charge/polarity of residues
             - Fraction of carbon / nitrogen / oxygen
             - Mean distance between residue centers of mass
-            - Mean distance between CA's in active site
             - Total number of atoms / residues
         Between two sites:
             - Fraction of residues shared
             - Fraction of residue TYPES (by polarity/charge) shared            
     """
 
-    polarity = {
+    chem_properties = {
         "GLY": "nonpolar",
         "ALA": "nonpolar",
         "VAL": "nonpolar",
@@ -45,20 +48,43 @@ def compute_similarity(site_a, site_b):
         "ASP": "acidic",
         "GLU": "acidic",
         }
+        
+    charge = {"nonpolar": 0, "polar": 0, "basic": 1, "acidic": -1}
+    polarity = {"nonpolar":0, "polar": 0.5, "basic": 1, "acidic": 1}
     
-    metrics_a = []
-    metrics_b = []
+    metrics = ['meanChar','varChar','meanPol','varPol','elemFrac',
+        'distCOM','numAtoms','numRes']
+
+    metrics_site_a = dict.fromkeys(metrics)
+    metrics_site_b = dict.fromkeys(metrics)
     
-    #first calculate mean and variance of total charge/polarity of residues
+    #first calculate mean and variance of total charges/polarity of residues
+    charges_a = np.ndarray(0)
+    polarity_a = np.ndarray(0)
+    charges_b = np.ndarray(0)
+    polarity_b = np.ndarray(0)
     
+    for residue in site_a.residues:
+        charges_a = np.append(charges_a, charge[chem_properties[residue.type.strip()]])
+        polarity_a = np.append(polarity_a, polarity[chem_properties[residue.type.strip()]])
+        
+    update_dict(metrics_site_a,
+        ('meanChar','varChar','meanPol','varPol'),
+        (np.mean(charges_a),np.var(charges_a),np.mean(polarity_a),np.var(polarity_a)))
+    
+    for residue in site_b.residues:
+        charges_b = np.append(charges_b, charge[chem_properties[residue.type.strip()]])
+        polarity_b = np.append(polarity_b, polarity[chem_properties[residue.type.strip()]])
+
+    update_dict(metrics_site_b,
+        ('meanChar','varChar','meanPol','varPol'),
+        (np.mean(charges_b),np.var(charges_b),np.mean(polarity_b),np.var(polarity_b)))
+
+    
+    #now calculate the fraction of atoms of carbon/nitrogen/oxygen in the active zone
     
     
     similarity = 0.0
-    
-    
-    
-
-    # Fill in your code here!
 
     return similarity
 
