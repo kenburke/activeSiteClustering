@@ -10,7 +10,8 @@ Clustering homework assignment, with continuous integration testing.
 1. Implement a similarity metric
 2. Implement a clustering method based on a partitioning algorithm
 3. Implement a clustering method based on a hierarchical algorithm
-4. Answer the questions given in the homework assignment
+4. Implement a function to measure the quality of the clustering
+5. Implement a function to compare the two clusterings to each other
 
 
 ## structure
@@ -22,7 +23,7 @@ The main file that you will need to modify is `cluster.py` and the corresponding
 ├── README.md
 ├── data
 │   ...
-├── hw2skeleton
+├── clustering
 │   ├── __init__.py
 │   ├── __main__.py
 │   ├── cluster.py
@@ -42,12 +43,14 @@ conda install --yes --file requirements.txt
 ```
 
 to install all the dependencies in `requirements.txt`. Then the package's
-main function (located in `hw2skeleton/__main__.py`) can be run as
+main function (located in `clustering/__main__.py`) can be run as
 follows
 
 ```
-python -m hw2skeleton -P data test.txt
+python -m clustering [-P| -H] data test.txt
 ```
+
+where ``-P`` and ``-H`` use partition or hierarchical clustering, respectively.
 
 ## testing
 
