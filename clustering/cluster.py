@@ -9,6 +9,9 @@ def compute_similarity(site_a, site_b):
     """
 
     similarity = 0.0
+    
+    
+    
 
     # Fill in your code here!
 
@@ -31,7 +34,7 @@ def cluster_by_partitioning(active_sites):
 
 def cluster_hierarchically(active_sites):
     """
-    Cluster the given set of ActiveSite instances using a hierarchical algorithm.                                                                  #
+    Cluster the given set of ActiveSite instances using a hierarchical algorithm.
 
     Input: a list of ActiveSite instances
     Output: a list of clusterings
