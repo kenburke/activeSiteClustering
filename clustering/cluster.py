@@ -6,8 +6,27 @@ def compute_similarity(site_a, site_b):
 
     Input: two ActiveSite instances
     Output: the similarity between them (a floating point number)
+    
+    Logic behind similarity computation:
+        - Average of several metrics with different biological meaning
+        - Attempt to cover chemistry, morphology and homogeneity with metrics
+        
+    Metrics:
+        Within Active Site:
+            - Mean and Variance of total charge/polarity of residues
+            - Fraction of carbon / nitrogen / oxygen
+            - Mean distance between residue centers of mass
+            - Mean distance between CA's in active site
+            - Total number of atoms / residues
+        Between two sites:
+            - Fraction of residues shared
+            - Fraction of residue TYPES (by polarity/charge) shared            
     """
 
+    
+    
+    
+    
     similarity = 0.0
     
     
