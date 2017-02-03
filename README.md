@@ -38,7 +38,7 @@ The main file that you will need to modify is `cluster.py` and the corresponding
 To use the package, first create a conda environment
 
 ```
-conda create env
+conda env create
 ```
 
 to install all dependencies outlined in `environment.yml`. Then activate the env
