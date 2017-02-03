@@ -34,7 +34,7 @@ def compute_similarity(site_a, site_b):
         "TYR": "nonpolar",
         "TRP": "nonpolar",
         "PRO": "nonpolar",
-        "CYS": "nonpolar"
+        "CYS": "nonpolar",
         "SER": "polar",
         "THR": "polar",
         "ASN": "polar",
@@ -45,6 +45,11 @@ def compute_similarity(site_a, site_b):
         "ASP": "acidic",
         "GLU": "acidic",
         }
+    
+    metrics_a = []
+    metrics_b = []
+    
+    #first calculate mean and variance of total charge/polarity of residues
     
     
     
