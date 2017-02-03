@@ -1,7 +1,7 @@
 # Clustering Homework
 
 [![Build
-Status](https://travis-ci.org/kenburke/clustering.svg?branch=master)](https://travis-ci.org/kenburke/clustering)
+Status](https://travis-ci.org/kenburke/activeSiteClustering.svg?branch=master)](https://travis-ci.org/kenburke/activeSiteClustering)
 
 Clustering homework assignment, with continuous integration testing.
 
