@@ -1,5 +1,5 @@
-from hw2skeleton import cluster
-from hw2skeleton import io
+from clustering import cluster
+from clustering import io
 import os
 
 def test_similarity():
