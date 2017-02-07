@@ -76,7 +76,7 @@ def compute_similarity(site_a, site_b, redo_mean_dev=False):
     #take the cosine of the angle between them, then normalize to [0,1] range
             
     similarity = np.dot(metric_arr_a,metric_arr_b)/float(np.linalg.norm(metric_arr_a)*np.linalg.norm(metric_arr_b))
-    similarity = round((similarity+1.0)/2,4)
+    similarity = (similarity+1.0)/2
     
     return similarity, site_metrics
 
