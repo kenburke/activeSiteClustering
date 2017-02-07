@@ -9,10 +9,10 @@ def test_similarity():
     activesite_a = io.read_active_site(filename_a)
     activesite_b = io.read_active_site(filename_b)
 
-    # reflexive
+    # Reflexive
     assert cluster.compute_similarity(activesite_a, activesite_a) > 0.99
     
-    # symmetric
+    # Symmetric
     assert cluster.compute_similarity(activesite_a, activesite_b) == 
         cluster.compute_similarity(activesite_b, activesite_a) 
 
