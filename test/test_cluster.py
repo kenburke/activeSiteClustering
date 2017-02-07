@@ -3,7 +3,18 @@ from clustering import io
 import os
 from random import random, seed
 
-def test_similarity():
+
+@pytest.mark.parametrize("site", [
+    (["276","1806","4629"]), #first two small and basic, last is big and acidic
+    (["3733","3458","71389"]) 
+])
+
+def test_similarity(sites):
+    """
+    Test similarity function for expected identities and behavior with test data
+    
+    Input: a list of 3 sites, the first two being more similar than the third.
+    """
     
     activeSites = io.read_active_sites('data/')
 
@@ -30,9 +41,9 @@ def test_similarity():
     
     
     # get known sites from activeSites
-    ind_a = cluster.find_active_sites(activeSites,"276")[0] #small, highly negatively charged
-    ind_b = cluster.find_active_sites(activeSites,"1806")[0] #very similar to 276, but a bit bigger and diffuse
-    ind_c = cluster.find_active_sites(activeSites,"4629")[0] #very different from both (relatively large, acidic, nonpolar)
+    ind_a = cluster.find_active_sites(activeSites,sites[0])[0] #small, highly negatively charged
+    ind_b = cluster.find_active_sites(activeSites,sites[1])[0] #very similar to 276, but a bit bigger and diffuse
+    ind_c = cluster.find_active_sites(activeSites,sites[2])[0] #very different from both (relatively large, acidic, nonpolar)
 
     sim_ab, met_ab = cluster.compute_similarity(activeSites[ind_a],activeSites[ind_b])
     sim_bc, met_bc = cluster.compute_similarity(activeSites[ind_b],activeSites[ind_c])
