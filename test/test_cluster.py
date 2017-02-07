@@ -9,7 +9,6 @@ import pytest
     (["276","1806","70919"]), #first two small and basic, last is big and acidic
     (["3733","3458","71389"]) 
 ])
-
 def test_similarity(sites):
     """
     Test similarity function for expected identities and behavior with test data
@@ -60,7 +59,7 @@ def test_similarity(sites):
     assert (1-sim_ab)-(1-sim_ac+1-sim_bc) < tolerance # small tolerance for rounding errors
     assert (1-sim_ac)-(1-sim_ab+1-sim_bc) < tolerance
     assert (1-sim_bc)-(1-sim_ab+1-sim_ac) < tolerance
-    
+
 def test_partition_clustering():
     # tractable subset
     pdb_ids = [276, 4629, 10701]

@@ -13,7 +13,9 @@ def compute_similarity(site_a, site_b, redo_mean_dev=False):
             the factors derived from the original dataset. Otherwise (e.g. if True), 
             normalize according to data currently in data folder
             
-    Output: the similarity between them (a floating point number)
+    Output: 
+        -the similarity between them (a floating point number)
+        -the two vectors used to calculate similarity (in a list)
     
     Logic behind similarity computation:
         - Average of several metrics with different biological meaning
@@ -30,7 +32,8 @@ def compute_similarity(site_a, site_b, redo_mean_dev=False):
     
     Then:
         -Normalize the metrics vectors
-        -Find the cosine of the angle between the vectors
+        -Find the Euclidean distance between the vectors
+        -Transform distance to similarity on range [0,1]
     """
 
     #get all of the summary metrics for each site
@@ -47,38 +50,31 @@ def compute_similarity(site_a, site_b, redo_mean_dev=False):
     
     #normalize
     for i in range(len(site_metrics)):
-    
         for metric, value in site_metrics[i].items():
-    
-            if isinstance(value,int) or isinstance(value,float):
-                site_metrics[i][metric] = (value-means[metric])/float(devs[metric])
-            
-            elif isinstance(value,dict):
-                for subMet, subVal in site_metrics[i][metric].items():
-                    site_metrics[i][metric][subMet] = (subVal-means[metric][subMet])/float(devs[metric][subMet])
+            site_metrics[i][metric] = (value-means[metric])/float(devs[metric])
     
     #convert to arrays
+    #NOTE: When converting into array, follows the metric_names list
+    #so that you can consistently compare numpy arrays element-wise
+    
+    metric_names = ['meanChar','varChar','meanPol','varPol',
+        'elemFracC','elemFracN','elemFracO','numAtoms','numRes','meanResDist','varResDist', 
+        'nonpolarFrac','polarFrac','acidicFrac','basicFrac']
+        
     metric_arr_a = np.ndarray(0)
     metric_arr_b = np.ndarray(0)
     
-    for metric, value in site_metrics[0].items():
-
-        if isinstance(value,int) or isinstance(value,float):
-            metric_arr_a = np.append(metric_arr_a,site_metrics[0][metric])
-            metric_arr_b = np.append(metric_arr_b,site_metrics[1][metric])
-        
-        elif isinstance(value,dict):
-            for subMet, subVal in value.items():
-                metric_arr_a = np.append(metric_arr_a,site_metrics[0][metric][subMet])
-                metric_arr_b = np.append(metric_arr_b,site_metrics[1][metric][subMet])
+    for metric in metric_names:
+        metric_arr_a = np.append(metric_arr_a,site_metrics[0][metric])
+        metric_arr_b = np.append(metric_arr_b,site_metrics[1][metric])      
     
+    metric_arrays = [metric_arr_a, metric_arr_b]
     
-    #take the cosine of the angle between them, then normalize to [0,1] range
-            
-    similarity = np.dot(metric_arr_a,metric_arr_b)/float(np.linalg.norm(metric_arr_a)*np.linalg.norm(metric_arr_b))
-    similarity = (similarity+1.0)/2
+    #take the distance between them, then normalize to [0,1] range
+    distance = np.linalg.norm(metric_arr_a - metric_arr_b)
+    similarity = 1.0/(1.0+distance)
     
-    return similarity, site_metrics
+    return similarity, metric_arrays
 
 def individual_metrics(active_site,printMe=None):
     """
@@ -123,11 +119,11 @@ def individual_metrics(active_site,printMe=None):
     
     atom_type = {"C":0,"N":0,"O":0}
     
-    metric_names = ['meanChar','varChar','meanPol','varPol','elemFrac',
-        'numAtoms','numRes','meanResDist','varResDist', 'resTypes']
+    metric_names = ['meanChar','varChar','meanPol','varPol',
+        'elemFracC','elemFracN','elemFracO','numAtoms','numRes','meanResDist','varResDist', 
+        'nonpolarFrac','polarFrac','acidicFrac','basicFrac']
     
     metrics = dict.fromkeys(metric_names)
-    
     
     #first calculate mean and variance of total charges/polarity of residues
     residue_charge = np.ndarray(0)
@@ -143,10 +139,10 @@ def individual_metrics(active_site,printMe=None):
         res_type[key] /= numRes
         
     update_dict(metrics,
-        ('meanChar','varChar','meanPol','varPol','resTypes'),
+        ('meanChar','varChar','meanPol','varPol','nonpolarFrac','polarFrac','acidicFrac','basicFrac'),
         (np.mean(residue_charge),np.var(residue_charge),
             np.mean(residue_polarity),np.var(residue_polarity),
-            res_type)
+            res_type['nonpolar'],res_type['polar'],res_type['acidic'],res_type['basic'])
         )
       
     #now calculate the fraction of atoms of carbon/nitrogen/oxygen in the active zone
@@ -167,8 +163,8 @@ def individual_metrics(active_site,printMe=None):
         atom_type[key] /= numAtoms
     
     update_dict(metrics,
-        ('elemFrac','numAtoms','numRes'),
-        (atom_type,numAtoms,numRes)
+        ('elemFracC','elemFracN','elemFracO','numAtoms','numRes'),
+        (atom_type['C'],atom_type['N'],atom_type['O'],numAtoms,numRes)
         )
     
     #now calculate the "center of mass" for each residue.
@@ -225,19 +221,11 @@ def gen_mean_dev_normalizations():
         siteMetrics = individual_metrics(site)
         
         for metric, value in siteMetrics.items():
-        
-            if isinstance(value,int) or isinstance(value,float):
-                if i==0:
-                    means[metric] /= float(len(activeSites))
-                else:
-                    means[metric] += siteMetrics[metric]/float(len(activeSites))
+            if i==0:
+                means[metric] /= float(len(activeSites))
+            else:
+                means[metric] += siteMetrics[metric]/float(len(activeSites))
                 
-            elif isinstance(value,dict):
-                for subMet, subVal in siteMetrics[metric].items():
-                    if i==0:
-                        means[metric][subMet] /= float(len(activeSites))
-                    else:
-                        means[metric][subMet] += subVal/float(len(activeSites))
     
     #now get mean absolute deviation
     for i in range(len(activeSites)):
@@ -246,21 +234,12 @@ def gen_mean_dev_normalizations():
         
         siteMetrics = individual_metrics(site)
         
-        for metric, value in siteMetrics.items():
-        
-            if isinstance(value,int) or isinstance(value,float):
-                if i==0:
-                    devs[metric] = 0
-                
-                devs[metric] += abs(siteMetrics[metric]-means[metric])/float(len(activeSites))
+        for metric, value in siteMetrics.items():        
+            if i==0:
+                devs[metric] = 0
+            devs[metric] += abs(siteMetrics[metric]-means[metric])/float(len(activeSites))
                 
                 
-            elif isinstance(value,dict):
-                for subMet, subVal in siteMetrics[metric].items():
-                    if i==0:
-                        devs[metric][subMet] = 0
-
-                    devs[metric][subMet] += abs(subVal-means[metric][subMet])/float(len(activeSites))
                     
     save_obj(means,'means')
     save_obj(devs,'devs')
@@ -287,15 +266,16 @@ def find_active_sites(activeSites, targetName):
     
     return [i for i, j in enumerate(activeSites) if j.name==targetName]
 
-def cluster_by_partitioning(active_sites):
+def cluster_by_partitioning(active_sites,num_clusters=3):
     """
     Cluster a given set of ActiveSite instances using a partitioning method.
 
-    Input: a list of ActiveSite instances
+    Input: a list of ActiveSite instances, (OPTIONAL: number of clusters, default 3)
     Output: a clustering of ActiveSite instances
             (this is really a list of clusters, each of which is list of
             ActiveSite instances)
     """
+    
     # Fill in your code here!
 
     return []
