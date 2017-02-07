@@ -20,11 +20,11 @@ def test_similarity(sites):
 
     # get random sites from activeSites    
     seed()
-    rand1 = round(random.random()*len(activeSites))
-    rand2 = round(random.random()*len(activeSites))
+    rand1 = round(random()*len(activeSites))
+    rand2 = round(random()*len(activeSites))
     
     while rand2 == rand1:
-        rand2 = round(random.random()*len(activeSites))
+        rand2 = round(random()*len(activeSites))
 
     #Range
     sim_y, metrics_y = cluster.compute_similarity(activeSites[rand1], activeSites[rand2])
