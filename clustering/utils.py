@@ -201,7 +201,7 @@ class ActiveSite:
             metric_arr = np.append(metric_arr,self.metrics[0][metric])
             
         #store
-        self.metrics[1] = metrics_arr
+        self.metrics[1] = metric_arr
         
         return self.metrics[1]
     
