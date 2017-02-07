@@ -4,7 +4,7 @@ import numpy as np
 import pickle
 from .utils import Atom, Residue, ActiveSite
 import numpy as np
-from itertools import combinations as combo
+from itertools import combinations as combo    
 
 def read_active_sites(dir):
     """

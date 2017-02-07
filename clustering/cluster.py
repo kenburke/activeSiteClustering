@@ -76,7 +76,7 @@ def compute_similarity(site_a, site_b, redo_mean_dev=False):
     #take the cosine of the angle between them, then normalize to [0,1] range
             
     similarity = np.dot(metric_arr_a,metric_arr_b)/float(np.linalg.norm(metric_arr_a)*np.linalg.norm(metric_arr_b))
-    similarity = (similarity+1.0)/2
+    similarity = round((similarity+1.0)/2,4)
     
     return similarity, site_metrics
 
@@ -192,9 +192,7 @@ def individual_metrics(active_site,printMe=None):
     for pair in combo(active_site.residues,2):
         distance = np.linalg.norm(np.asarray(pair[0].com)-np.asarray(pair[1].com))
         residue_dist.append(distance)  
-    
-#    print(residue_dist)  
-    
+       
     update_dict(metrics,
         ('meanResDist','varResDist'),
         (np.mean(residue_dist),np.var(residue_dist))
@@ -213,7 +211,6 @@ def gen_mean_dev_normalizations():
         -stores them in pickled format
     cluster.compute_similarity uses 
     """
-    print("LOOK AT ME!")
     activeSites = read_active_sites('data')
     
     #initialize
@@ -271,7 +268,24 @@ def gen_mean_dev_normalizations():
     return means, devs
 
 def update_dict(dictionary,keys,values):
+    """
+    Update dictionary given lists of keys and values
+    
+    Input: dictionary, keys, values
+    Output: None (dictionary updated automatically)
+    """
+
     dictionary.update(dict(zip(keys,values)))
+    
+def find_active_sites(activeSites, targetName):
+    """
+    Find an active site in a list of AS's given the name
+    
+    Input: list of active sites, name of target
+    Output: list of indeces of matched active sites
+    """
+    
+    return [i for i, j in enumerate(activeSites) if j.name==targetName]
 
 def cluster_by_partitioning(active_sites):
     """
