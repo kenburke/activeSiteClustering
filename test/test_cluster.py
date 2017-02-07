@@ -5,7 +5,7 @@ from random import random, seed
 import pytest
 
 
-@pytest.mark.parametrize("site", [
+@pytest.mark.parametrize("sites", [
     (["276","1806","4629"]), #first two small and basic, last is big and acidic
     (["3733","3458","71389"]) 
 ])
