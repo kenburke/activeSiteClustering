@@ -4,7 +4,9 @@ import numpy as np
 import pickle
 from .utils import Atom, Residue, ActiveSite
 import numpy as np
-from itertools import combinations as combo    
+from itertools import combinations as combo  
+from copy import deepcopy
+  
 
 def read_active_sites(dir):
     """
@@ -118,4 +120,52 @@ def save_obj(obj, name):
 def load_obj(name):
     with open('obj/' + name + '.pkl', 'rb') as f:
         return pickle.load(f)
+
+def gen_mean_dev_normalizations():
+    """
+    Used to generate Mean and Deviation dictionaries for similarity function.
+        -generates values from all PDB files in data folder
+        -stores them in pickled format
+    """
+    activeSites = read_active_sites('data')
+
+    #initialize
+    means = deepcopy(individual_metrics(activeSites[0]))
+    devs = deepcopy(individual_metrics(activeSites[0]))
+
+    #sum (with scale for auto-mean)
+    for i in range(len(activeSites)):
+        
+        site = activeSites[i]
+    
+        siteMetrics = individual_metrics(site)
+    
+        for metric, value in siteMetrics.items():
+            if i==0:
+                means[metric] /= float(len(activeSites))
+            else:
+                means[metric] += siteMetrics[metric]/float(len(activeSites))
+            
+
+    #now get mean absolute deviation
+    for i in range(len(activeSites)):
+        
+        site = activeSites[i]
+    
+        siteMetrics = individual_metrics(site)
+    
+        for metric, value in siteMetrics.items():        
+            if i==0:
+                devs[metric] = 0
+            devs[metric] += abs(siteMetrics[metric]-means[metric])/float(len(activeSites))
+                        
+                
+    save_obj(means,'means_dict')
+    save_obj(devs,'devs_dict')
+
+    #now flatten and save reference arrays
+    save_obj(flatten_metrics(means),'means_arr')
+    save_obj(flatten_metrics(devs),'devs_arr')
+    
+    return means, devs
 

@@ -1,8 +1,7 @@
 # Some utility classes to represent a PDB structure
-from .io import load_obj, save_obj, read_active_sites
+import io
 import numpy as np
 from itertools import combinations as combo
-from copy import deepcopy
 
 class Atom:
     """
@@ -213,10 +212,10 @@ class ActiveSite:
     
         #if you want to recalculate mean/devs
         if redo_mean_dev:
-            gen_mean_dev_normalizations()
+            io.gen_mean_dev_normalizations()
     
-        means = load_obj('means_arr')
-        devs = load_obj('devs_arr')
+        means = io.load_obj('means_arr')
+        devs = io.load_obj('devs_arr')
     
         #normalize
         
@@ -224,55 +223,6 @@ class ActiveSite:
 
         return self.metrics[2]
     
-    def _gen_mean_dev_normalizations(self):
-        """
-        Used to generate Mean and Deviation dictionaries for similarity function.
-            -generates values from all PDB files in data folder
-            -stores them in pickled format
-        cluster.compute_similarity uses 
-        """
-        activeSites = read_active_sites('data')
-    
-        #initialize
-        means = deepcopy(individual_metrics(activeSites[0]))
-        devs = deepcopy(individual_metrics(activeSites[0]))
-    
-        #sum (with scale for auto-mean)
-        for i in range(len(activeSites)):
-            
-            site = activeSites[i]
-        
-            siteMetrics = individual_metrics(site)
-        
-            for metric, value in siteMetrics.items():
-                if i==0:
-                    means[metric] /= float(len(activeSites))
-                else:
-                    means[metric] += siteMetrics[metric]/float(len(activeSites))
-                
-    
-        #now get mean absolute deviation
-        for i in range(len(activeSites)):
-            
-            site = activeSites[i]
-        
-            siteMetrics = individual_metrics(site)
-        
-            for metric, value in siteMetrics.items():        
-                if i==0:
-                    devs[metric] = 0
-                devs[metric] += abs(siteMetrics[metric]-means[metric])/float(len(activeSites))
-                            
-                    
-        save_obj(means,'means_dict')
-        save_obj(devs,'devs_dict')
-    
-        #now flatten and save reference arrays
-        save_obj(flatten_metrics(means),'means_arr')
-        save_obj(flatten_metrics(devs),'devs_arr')
-        
-        return means, devs
-
     def _update_dict(dictionary,keys,values):
         """
         Update dictionary given lists of keys and values
