@@ -2,6 +2,7 @@ from clustering import cluster
 from clustering import io
 import os
 from random import random, seed
+import pytest
 
 
 @pytest.mark.parametrize("site", [
