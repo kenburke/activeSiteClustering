@@ -18,7 +18,7 @@ def test_similarity(sites):
     
     activeSites = io.read_active_sites('data/')
     
-    tolerance = 0.01
+    tolerance = 0.001
     
     # get random sites from activeSites    
     seed()
