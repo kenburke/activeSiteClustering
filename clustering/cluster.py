@@ -1,5 +1,5 @@
 from .utils import Atom, Residue, ActiveSite
-from .io import load_obj, save_obj, read_active_sites
+from .io import read_active_sites
 import numpy as np
 from random import seed, sample
 
