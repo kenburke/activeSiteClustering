@@ -195,7 +195,7 @@ class ActiveSite:
             'elemFracC','elemFracN','elemFracO','numAtoms','numRes','meanResDist','varResDist', 
             'nonpolarFrac','polarFrac','acidicFrac','basicFrac']
     
-        metrics_arr = np.ndarray(0)
+        metric_arr = np.ndarray(0)
     
         for metric in metric_names:
             metric_arr = np.append(metric_arr,metrics_dict[metric])
