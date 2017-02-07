@@ -118,7 +118,7 @@ class ActiveSite:
         for key in res_type.keys():
             res_type[key] /= numRes
         
-        self.update_dict(metrics,
+        self._update_dict(metrics,
             ('meanChar','varChar','meanPol','varPol','nonpolarFrac','polarFrac','acidicFrac','basicFrac'),
             (np.mean(residue_charge),np.var(residue_charge),
                 np.mean(residue_polarity),np.var(residue_polarity),
@@ -142,7 +142,7 @@ class ActiveSite:
         for key in atom_type.keys():
             atom_type[key] /= numAtoms
     
-        self.update_dict(metrics,
+        self._update_dict(metrics,
             ('elemFracC','elemFracN','elemFracO','numAtoms','numRes'),
             (atom_type['C'],atom_type['N'],atom_type['O'],numAtoms,numRes)
             )
@@ -169,7 +169,7 @@ class ActiveSite:
             distance = np.linalg.norm(np.asarray(pair[0].com)-np.asarray(pair[1].com))
             residue_dist.append(distance)  
        
-        update_dict(metrics,
+        self._update_dict(metrics,
             ('meanResDist','varResDist'),
             (np.mean(residue_dist),np.var(residue_dist))
             )
