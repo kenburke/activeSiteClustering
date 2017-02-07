@@ -1,5 +1,4 @@
 from .utils import Atom, Residue, ActiveSite
-from .io import load_obj, save_obj, read_active_sites
 import numpy as np
 from itertools import combinations as combo
 from copy import deepcopy

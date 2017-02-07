@@ -1,5 +1,4 @@
 # Some utility classes to represent a PDB structure
-import io
 import numpy as np
 from itertools import combinations as combo
 
@@ -214,8 +213,8 @@ class ActiveSite:
         if redo_mean_dev:
             io.gen_mean_dev_normalizations()
     
-        means = io.load_obj('means_arr')
-        devs = io.load_obj('devs_arr')
+        means = load_pickle('means_arr')
+        devs = load_pickle('devs_arr')
     
         #normalize
         
@@ -232,4 +231,13 @@ class ActiveSite:
         """
 
         dictionary.update(dict(zip(keys,values)))
+        
+def save_pickle(obj, name):
+    with open('obj/'+ name + '.pkl', 'wb') as f:
+        pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
+
+def load_pickle(name):
+    with open('obj/' + name + '.pkl', 'rb') as f:
+        return pickle.load(f)
+
         

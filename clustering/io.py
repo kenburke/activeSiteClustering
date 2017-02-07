@@ -2,7 +2,7 @@ import glob
 import os
 import numpy as np
 import pickle
-from .utils import Atom, Residue, ActiveSite
+from .utils import Atom, Residue, ActiveSite, save_pickle, load_pickle
 import numpy as np
 from itertools import combinations as combo  
 from copy import deepcopy
@@ -113,14 +113,6 @@ def write_mult_clusterings(filename, clusterings):
 
     out.close()
     
-def save_obj(obj, name):
-    with open('obj/'+ name + '.pkl', 'wb') as f:
-        pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
-
-def load_obj(name):
-    with open('obj/' + name + '.pkl', 'rb') as f:
-        return pickle.load(f)
-
 def gen_mean_dev_normalizations():
     """
     Used to generate Mean and Deviation dictionaries for similarity function.
@@ -160,12 +152,12 @@ def gen_mean_dev_normalizations():
             devs[metric] += abs(siteMetrics[metric]-means[metric])/float(len(activeSites))
                         
                 
-    save_obj(means,'means_dict')
-    save_obj(devs,'devs_dict')
+    save_pickle(means,'means_dict')
+    save_pickle(devs,'devs_dict')
 
     #now flatten and save reference arrays
-    save_obj(flatten_metrics(means),'means_arr')
-    save_obj(flatten_metrics(devs),'devs_arr')
+    save_pickle(flatten_metrics(means),'means_arr')
+    save_pickle(flatten_metrics(devs),'devs_arr')
     
     return means, devs
 
