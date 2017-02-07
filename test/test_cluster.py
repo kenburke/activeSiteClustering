@@ -6,7 +6,7 @@ import pytest
 
 
 @pytest.mark.parametrize("sites", [
-    (["276","1806","4629"]), #first two small and basic, last is big and acidic
+    (["276","1806","70919"]), #first two small and basic, last is big and acidic
     (["3733","3458","71389"]) 
 ])
 
@@ -18,7 +18,9 @@ def test_similarity(sites):
     """
     
     activeSites = io.read_active_sites('data/')
-
+    
+    tolerance = 0.01
+    
     # get random sites from activeSites    
     seed()
     rand1 = round(random()*len(activeSites))
@@ -29,36 +31,35 @@ def test_similarity(sites):
 
     #Range
     sim_y, metrics_y = cluster.compute_similarity(activeSites[rand1], activeSites[rand2])
-    assert -0.01 <= sim_y <= 1.01 #tolerance for rounding errors
+    assert (0-tolerance) <= sim_y <= (1+tolerance) #tolerance for rounding errors
     
     # Reflexive
     sim_ref, metrics_ref = cluster.compute_similarity(activeSites[rand1],activeSites[rand1])
-    assert sim_ref > 0.99 # tolerance for rounding errors
+    assert sim_ref > (1-tolerance) # tolerance for rounding errors
     
     # Symmetric
     sim_x, metrics_x = cluster.compute_similarity(activeSites[rand1], activeSites[rand2])
     sim_y, metrics_y = cluster.compute_similarity(activeSites[rand2], activeSites[rand1])
-    assert abs(sim_x - sim_y) < 0.01 # tolerance for rounding errors
+    assert abs(sim_x - sim_y) < (0+tolerance) # tolerance for rounding errors
     
     
     # get known sites from activeSites
-    ind_a = cluster.find_active_sites(activeSites,sites[0])[0] #small, highly negatively charged
-    ind_b = cluster.find_active_sites(activeSites,sites[1])[0] #very similar to 276, but a bit bigger and diffuse
-    ind_c = cluster.find_active_sites(activeSites,sites[2])[0] #very different from both (relatively large, acidic, nonpolar)
+    ind_a = cluster.find_active_sites(activeSites,sites[0])[0]
+    ind_b = cluster.find_active_sites(activeSites,sites[1])[0]
+    ind_c = cluster.find_active_sites(activeSites,sites[2])[0]
 
     sim_ab, met_ab = cluster.compute_similarity(activeSites[ind_a],activeSites[ind_b])
     sim_bc, met_bc = cluster.compute_similarity(activeSites[ind_b],activeSites[ind_c])
     sim_ac, met_ac = cluster.compute_similarity(activeSites[ind_a],activeSites[ind_c])
     
     # Similar ones are closer than dissimilar ones
-    
-    assert sim_ab > sim_ac
-    assert sim_ab > sim_bc
+    assert sim_ab - sim_ac > tolerance
+    assert sim_ab - sim_bc > tolerance
     
     # Triangle inequality
-    assert (1-sim_ab)-(1-sim_ac+1-sim_bc) < 0.01 # small tolerance for rounding errors
-    assert (1-sim_ac)-(1-sim_ab+1-sim_bc) < 0.01
-    assert (1-sim_bc)-(1-sim_ab+1-sim_ac) < 0.01
+    assert (1-sim_ab)-(1-sim_ac+1-sim_bc) < tolerance # small tolerance for rounding errors
+    assert (1-sim_ac)-(1-sim_ab+1-sim_bc) < tolerance
+    assert (1-sim_bc)-(1-sim_ab+1-sim_ac) < tolerance
     
 def test_partition_clustering():
     # tractable subset
