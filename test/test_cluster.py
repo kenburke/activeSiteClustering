@@ -29,16 +29,16 @@ def test_similarity(sites):
 
     #Range
     sim_y, metrics_y = cluster.compute_similarity(activeSites[rand1], activeSites[rand2])
-    assert 0 <= sim_y <= 1
+    assert -0.01 <= sim_y <= 1.01 #tolerance for rounding errors
     
     # Reflexive
     sim_ref, metrics_ref = cluster.compute_similarity(activeSites[rand1],activeSites[rand1])
-    assert sim_ref > 0.99
+    assert sim_ref > 0.99 # tolerance for rounding errors
     
     # Symmetric
     sim_x, metrics_x = cluster.compute_similarity(activeSites[rand1], activeSites[rand2])
     sim_y, metrics_y = cluster.compute_similarity(activeSites[rand2], activeSites[rand1])
-    assert sim_x == sim_y
+    assert abs(sim_x - sim_y) < 0.01 # tolerance for rounding errors
     
     
     # get known sites from activeSites
@@ -56,9 +56,9 @@ def test_similarity(sites):
     assert sim_ab > sim_bc
     
     # Triangle inequality
-    assert (1-sim_ab)<(1-sim_ac+1-sim_bc)
-    assert (1-sim_ac)<(1-sim_ab+1-sim_bc)
-    assert (1-sim_bc)<(1-sim_ab+1-sim_ac)
+    assert (1-sim_ab)-(1-sim_ac+1-sim_bc) < 0.01 # small tolerance for rounding errors
+    assert (1-sim_ac)-(1-sim_ab+1-sim_bc) < 0.01
+    assert (1-sim_bc)-(1-sim_ab+1-sim_ac) < 0.01
     
 def test_partition_clustering():
     # tractable subset
