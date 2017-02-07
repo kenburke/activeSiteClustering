@@ -13,8 +13,9 @@ def test_similarity():
     assert cluster.compute_similarity(activesite_a, activesite_a) > 0.99
     
     # Symmetric
-    assert cluster.compute_similarity(activesite_a, activesite_b) == 
-        cluster.compute_similarity(activesite_b, activesite_a) 
+    sim_x, metrics_x = cluster.compute_similarity(activesite_a, activesite_b)
+    sim_y, metrics_y = cluster.compute_similarity(activesite_b, activesite_a)
+    assert sim_x == sim_y
 
 def test_partition_clustering():
     # tractable subset
