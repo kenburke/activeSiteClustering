@@ -1,5 +1,4 @@
-from clustering import cluster
-from clustering import io
+from clustering import cluster, io, similarity
 import os
 from random import random, seed
 import pytest
@@ -18,7 +17,7 @@ def test_similarity(sites):
     
     activeSites = io.read_active_sites('data/')
     
-    tolerance = 0.001
+    tolerance = 0.001 # for rounding errors
     
     # get random sites from activeSites    
     seed()
@@ -29,34 +28,34 @@ def test_similarity(sites):
         rand2 = round(random()*len(activeSites))
 
     #Range
-    sim_y, metrics_y = cluster.compute_similarity(activeSites[rand1], activeSites[rand2])
-    assert (0-tolerance) <= sim_y <= (1+tolerance) #tolerance for rounding errors
+    sim_y, metrics_y = similarity.compute_similarity(activeSites[rand1], activeSites[rand2])
+    assert (0-tolerance) <= sim_y <= (1+tolerance)
     
     # Reflexive
-    sim_ref, metrics_ref = cluster.compute_similarity(activeSites[rand1],activeSites[rand1])
-    assert sim_ref > (1-tolerance) # tolerance for rounding errors
+    sim_ref, metrics_ref = similarity.compute_similarity(activeSites[rand1],activeSites[rand1])
+    assert sim_ref > (1-tolerance) 
     
     # Symmetric
-    sim_x, metrics_x = cluster.compute_similarity(activeSites[rand1], activeSites[rand2])
-    sim_y, metrics_y = cluster.compute_similarity(activeSites[rand2], activeSites[rand1])
-    assert abs(sim_x - sim_y) < (0+tolerance) # tolerance for rounding errors
+    sim_x, metrics_x = similarity.compute_similarity(activeSites[rand1], activeSites[rand2])
+    sim_y, metrics_y = similarity.compute_similarity(activeSites[rand2], activeSites[rand1])
+    assert abs(sim_x - sim_y) < (0+tolerance)
     
     
     # get known sites from activeSites
-    ind_a = cluster.find_active_sites(activeSites,sites[0])[0]
-    ind_b = cluster.find_active_sites(activeSites,sites[1])[0]
-    ind_c = cluster.find_active_sites(activeSites,sites[2])[0]
+    ind_a = similarity.find_active_sites(activeSites,sites[0])[0]
+    ind_b = similarity.find_active_sites(activeSites,sites[1])[0]
+    ind_c = similarity.find_active_sites(activeSites,sites[2])[0]
 
-    sim_ab, met_ab = cluster.compute_similarity(activeSites[ind_a],activeSites[ind_b])
-    sim_bc, met_bc = cluster.compute_similarity(activeSites[ind_b],activeSites[ind_c])
-    sim_ac, met_ac = cluster.compute_similarity(activeSites[ind_a],activeSites[ind_c])
+    sim_ab, met_ab = similarity.compute_similarity(activeSites[ind_a],activeSites[ind_b])
+    sim_bc, met_bc = similarity.compute_similarity(activeSites[ind_b],activeSites[ind_c])
+    sim_ac, met_ac = similarity.compute_similarity(activeSites[ind_a],activeSites[ind_c])
     
     # Similar ones are closer than dissimilar ones
     assert sim_ab - sim_ac > tolerance
     assert sim_ab - sim_bc > tolerance
     
     # Triangle inequality
-    assert (1-sim_ab)-(1-sim_ac+1-sim_bc) < tolerance # small tolerance for rounding errors
+    assert (1-sim_ab)-(1-sim_ac+1-sim_bc) < tolerance 
     assert (1-sim_ac)-(1-sim_ab+1-sim_bc) < tolerance
     assert (1-sim_bc)-(1-sim_ab+1-sim_ac) < tolerance
 
