@@ -198,7 +198,7 @@ class ActiveSite:
         metric_arr = np.ndarray(0)
     
         for metric in metric_names:
-            metric_arr = np.append(metric_arr,metrics_dict[metric])
+            metric_arr = np.append(metric_arr,self.metrics[0][metric])
             
         #store
         self.metrics[1] = metrics_arr
