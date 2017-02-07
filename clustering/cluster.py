@@ -1,19 +1,17 @@
 from .utils import Atom, Residue, ActiveSite
+from .io import load_obj, save_obj, read_active_sites
 import numpy as np
 from itertools import combinations as combo
+from copy import deepcopy
 
-def update_dict(dictionary,keys,values):
-    dictionary.update(dict(zip(keys,values)))
-
-def compute_similarity(site_a, site_b, norm_factors):
+def compute_similarity(site_a, site_b, redo_mean_dev=False):
     """
     Compute the similarity between two given ActiveSite instances.
 
     Input: two ActiveSite instances
-        -NOTE, optional "custom_norm". Default: normalize according to 
-            the factors derived from the original dataset. Otherwise
-            (e.g. if True), normalize according to custom dictionary.
-            (for use within large datasets only).
+        -NOTE, optional "redo_mean_dev". Default: FALSE = normalize according to 
+            the factors derived from the original dataset. Otherwise (e.g. if True), 
+            normalize according to data currently in data folder
             
     Output: the similarity between them (a floating point number)
     
@@ -36,21 +34,51 @@ def compute_similarity(site_a, site_b, norm_factors):
     """
 
     #get all of the summary metrics for each site
-    metrics_site_a = individual_metrics(site_a)
-    metrics_site_b = individual_metrics(site_b)
+    site_metrics = [individual_metrics(site_a),individual_metrics(site_b)]
     
     #normalize metric vectors
     
-    for metric in metrics_site_a.keys():
-        
+        #if you want to recalculate mean/devs
+    if redo_mean_dev:
+        gen_mean_dev_normalizations()
     
-    #take the cosine of the angle between them
+    means = load_obj('means')
+    devs = load_obj('devs')
+    
+    #normalize
+    for i in range(len(site_metrics)):
+    
+        for metric, value in site_metrics[i].items():
+    
+            if isinstance(value,int) or isinstance(value,float):
+                site_metrics[i][metric] = (value-means[metric])/float(devs[metric])
             
-        
+            elif isinstance(value,dict):
+                for subMet, subVal in site_metrics[i][metric].items():
+                    site_metrics[i][metric][subMet] = (subVal-means[metric][subMet])/float(devs[metric][subMet])
     
-    similarity = 0.0
+    #convert to arrays
+    metric_arr_a = np.ndarray(0)
+    metric_arr_b = np.ndarray(0)
+    
+    for metric, value in site_metrics[0].items():
 
-    return similarity
+        if isinstance(value,int) or isinstance(value,float):
+            metric_arr_a = np.append(metric_arr_a,site_metrics[0][metric])
+            metric_arr_b = np.append(metric_arr_b,site_metrics[1][metric])
+        
+        elif isinstance(value,dict):
+            for subMet, subVal in value.items():
+                metric_arr_a = np.append(metric_arr_a,site_metrics[0][metric][subMet])
+                metric_arr_b = np.append(metric_arr_b,site_metrics[1][metric][subMet])
+    
+    
+    #take the cosine of the angle between them, then normalize to [0,1] range
+            
+    similarity = np.dot(metric_arr_a,metric_arr_b)/float(np.linalg.norm(metric_arr_a)*np.linalg.norm(metric_arr_b))
+    similarity = (similarity+1.0)/2
+    
+    return similarity, site_metrics
 
 def individual_metrics(active_site,printMe=None):
     """
@@ -178,6 +206,72 @@ def individual_metrics(active_site,printMe=None):
         
     return metrics
 
+def gen_mean_dev_normalizations():
+    """
+    Used to generate Mean and Deviation dictionaries for similarity function.
+        -generates values from all PDB files in data folder
+        -stores them in pickled format
+    cluster.compute_similarity uses 
+    """
+    print("LOOK AT ME!")
+    activeSites = read_active_sites('data')
+    
+    #initialize
+    means = deepcopy(individual_metrics(activeSites[0]))
+    devs = deepcopy(individual_metrics(activeSites[0]))
+    
+    #sum (with scale for auto-mean)
+    for i in range(len(activeSites)):
+            
+        site = activeSites[i]
+        
+        siteMetrics = individual_metrics(site)
+        
+        for metric, value in siteMetrics.items():
+        
+            if isinstance(value,int) or isinstance(value,float):
+                if i==0:
+                    means[metric] /= float(len(activeSites))
+                else:
+                    means[metric] += siteMetrics[metric]/float(len(activeSites))
+                
+            elif isinstance(value,dict):
+                for subMet, subVal in siteMetrics[metric].items():
+                    if i==0:
+                        means[metric][subMet] /= float(len(activeSites))
+                    else:
+                        means[metric][subMet] += subVal/float(len(activeSites))
+    
+    #now get mean absolute deviation
+    for i in range(len(activeSites)):
+            
+        site = activeSites[i]
+        
+        siteMetrics = individual_metrics(site)
+        
+        for metric, value in siteMetrics.items():
+        
+            if isinstance(value,int) or isinstance(value,float):
+                if i==0:
+                    devs[metric] = 0
+                
+                devs[metric] += abs(siteMetrics[metric]-means[metric])/float(len(activeSites))
+                
+                
+            elif isinstance(value,dict):
+                for subMet, subVal in siteMetrics[metric].items():
+                    if i==0:
+                        devs[metric][subMet] = 0
+
+                    devs[metric][subMet] += abs(subVal-means[metric][subMet])/float(len(activeSites))
+                    
+    save_obj(means,'means')
+    save_obj(devs,'devs')
+        
+    return means, devs
+
+def update_dict(dictionary,keys,values):
+    dictionary.update(dict(zip(keys,values)))
 
 def cluster_by_partitioning(active_sites):
     """

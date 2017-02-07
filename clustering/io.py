@@ -1,7 +1,10 @@
 import glob
 import os
+import numpy as np
+import pickle
 from .utils import Atom, Residue, ActiveSite
-
+import numpy as np
+from itertools import combinations as combo
 
 def read_active_sites(dir):
     """
@@ -107,3 +110,12 @@ def write_mult_clusterings(filename, clusterings):
                 out.write("%s\n" % clusters[j][k])
 
     out.close()
+    
+def save_obj(obj, name):
+    with open('obj/'+ name + '.pkl', 'wb') as f:
+        pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
+
+def load_obj(name):
+    with open('obj/' + name + '.pkl', 'rb') as f:
+        return pickle.load(f)
+
