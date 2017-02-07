@@ -1,8 +1,7 @@
 import glob
 import os
 import numpy as np
-import pickle
-from .utils import Atom, Residue, ActiveSite, save_pickle, load_pickle
+from .utils import Atom, Residue, ActiveSite, save_pickle, load_pickle, flatten_metrics
 import numpy as np
 from itertools import combinations as combo  
 from copy import deepcopy
@@ -122,15 +121,15 @@ def gen_mean_dev_normalizations():
     activeSites = read_active_sites('data')
 
     #initialize
-    means = deepcopy(individual_metrics(activeSites[0]))
-    devs = deepcopy(individual_metrics(activeSites[0]))
+    means = deepcopy(activeSites[0].get_raw_metrics())
+    devs = deepcopy(activeSites[0].get_raw_metrics())
 
     #sum (with scale for auto-mean)
     for i in range(len(activeSites)):
         
         site = activeSites[i]
     
-        siteMetrics = individual_metrics(site)
+        siteMetrics = site.get_raw_metrics()
     
         for metric, value in siteMetrics.items():
             if i==0:
@@ -144,7 +143,7 @@ def gen_mean_dev_normalizations():
         
         site = activeSites[i]
     
-        siteMetrics = individual_metrics(site)
+        siteMetrics = site.get_raw_metrics()
     
         for metric, value in siteMetrics.items():        
             if i==0:

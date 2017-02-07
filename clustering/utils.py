@@ -1,6 +1,7 @@
 # Some utility classes to represent a PDB structure
 import numpy as np
 from itertools import combinations as combo
+import pickle
 
 class Atom:
     """
@@ -51,7 +52,7 @@ class ActiveSite:
     def get_norm_metrics(self,redo_mean_dev=False):
         if self.metrics[2] is None or redo_mean_dev:
             self._individual_metrics()
-            self._flatten_metrics()
+            self.metrics[1] = flatten_metrics(self.metrics[0])
             self._normalize_metrics(redo_mean_dev)
         return self.metrics[2]
     
@@ -182,27 +183,6 @@ class ActiveSite:
         
         return self.metrics[0]
     
-    def _flatten_metrics(self):
-        """
-        Flattens metric dictionary into a numpy array
-        """
-    
-        #NOTE: When converting into array, follows the metric_names list
-        #so that you can consistently compare numpy arrays element-wise
-
-        metric_names = ['meanChar','varChar','meanPol','varPol',
-            'elemFracC','elemFracN','elemFracO','numAtoms','numRes','meanResDist','varResDist', 
-            'nonpolarFrac','polarFrac','acidicFrac','basicFrac']
-    
-        metric_arr = np.ndarray(0)
-    
-        for metric in metric_names:
-            metric_arr = np.append(metric_arr,self.metrics[0][metric])
-            
-        #store
-        self.metrics[1] = metric_arr
-        
-        return self.metrics[1]
     
     def _normalize_metrics(self,redo_mean_dev=False):
         """
@@ -240,4 +220,21 @@ def load_pickle(name):
     with open('obj/' + name + '.pkl', 'rb') as f:
         return pickle.load(f)
 
-        
+def flatten_metrics(metrics_dict):
+    """
+    Flattens metric dictionary into a numpy array
+    """
+
+    #NOTE: When converting into array, follows the metric_names list
+    #so that you can consistently compare numpy arrays element-wise
+
+    metric_names = ['meanChar','varChar','meanPol','varPol',
+        'elemFracC','elemFracN','elemFracO','numAtoms','numRes','meanResDist','varResDist', 
+        'nonpolarFrac','polarFrac','acidicFrac','basicFrac']
+
+    metric_arr = np.ndarray(0)
+
+    for metric in metric_names:
+        metric_arr = np.append(metric_arr,metrics_dict[metric])
+            
+    return metric_arr
