@@ -13,7 +13,7 @@ def cluster_by_partitioning(active_sites,num_clusters=3, max_iters=10000, dist_t
             ActiveSite instances)
     """
     
-    cluster_centers = k_means(active_sites,num_clusters,max_iters)
+    cluster_centers = k_means(active_sites,num_clusters,max_iters,dist_thresh)
     
     return []
     

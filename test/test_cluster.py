@@ -62,7 +62,7 @@ def test_similarity(sites):
 
 def test_partition_clustering():
     # tractable subset
-    pdb_ids = [276, 4629, 10701]
+    pdb_ids = [276, 3733, 4629, 10701, 70919] # two clusters, first three and last two
 
     active_sites = []
     for id in pdb_ids:
