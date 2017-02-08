@@ -1,9 +1,9 @@
 from .utils import Atom, Residue, ActiveSite
 from .io import read_active_sites
 import numpy as np
-from random import seed, sample
+from random import seed
 
-def cluster_by_partitioning(active_sites,num_clusters=5, num_iters=10000):
+def cluster_by_partitioning(active_sites,num_clusters=5, max_iters=10000, dist_thresh=0.01):
     """
     Cluster a given set of ActiveSite instances using a partitioning method.
 
@@ -13,11 +13,11 @@ def cluster_by_partitioning(active_sites,num_clusters=5, num_iters=10000):
             ActiveSite instances)
     """
     
-    cluster_centers = k_means(active_sites,num_clusters,num_iters)
+    cluster_centers = k_means(active_sites,num_clusters,max_iters)
     
     return []
     
-def k_means(active_sites,num_clusters,num_iters):
+def k_means(active_sites,num_clusters,max_iters,dist_thresh):
     """
     K-Means clustering
     
@@ -25,24 +25,47 @@ def k_means(active_sites,num_clusters,num_iters):
     Output: List of cluster centers as numpy arrays
     """
     
-    # house-keeping
+    # edge cases
     num_clusters = round(num_clusters)
-    num_iters = round(num_iters)
+    max_iters = round(max_iters)
     if num_clusters>len(active_sites) or numclusters<1:
         print("Invalid number of clusters: Default to 5")
         num_clusters = 5
     
     # initialize centroids randomly by choosing X random points
     seed()
-    rand1 = round(random()*len(active_sites))
-    rand2 = round(random()*len(active_sites))
+    inds = np.random.choice(len(activeSites),num_clusters,replace=False)
+    cluster_centers = np.array([active_sites[i].get_norm_metrics() for i in inds])
     
+    # init trackers
+    iter = 0
+    labels = np.zeros([len(active_sites)])    
+    prev_centers = np.zeros(cluster_centers.shape)
     
-    
-    cluster_centers = 0
-    
+    # begin algorithm
+    while not iter > max_iters and not distance_cutoff(prev_centers,cluster_centers,dist_thresh):
+        prev_centers = cluster_centers
+        iter += 1
+        
+        #assign all objects to a cluster, then reevaluate cluster centers
+        labels = assign_to_clusters(active_sites,cluster_centers)
+        cluster_centers = evaluate_cluster_locs(active_sites, labels, num_clusters)
+        
     return cluster_centers
+
+def distance_cutoff(prev,current,thresh):
+    """
+    Input: numpy arrays of previous/current centroid locations, and threshold
+    Output: boolean of whether centroids have moved farther than the threshold
+    """
     
+    
+    
+        
+def assign_to_clusters():
+
+def evaluate_cluster_locs():
+
 
 def cluster_hierarchically(active_sites):
     """
