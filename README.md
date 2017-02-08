@@ -55,6 +55,7 @@ python -m clustering [-P| -H] data test.txt
 ```
 
 where ``-P`` and ``-H`` use partition or hierarchical clustering, respectively.
+The output will be saved into ``test.txt``
 
 ## testing
 
@@ -65,6 +66,10 @@ python -m pytest
 ```
 
 from the root directory of this project.
+
+## interactive
+
+This homework comes with a Jupyter notebook in ``activeSiteClustering.ipynb``.
 
 
 ## contributors

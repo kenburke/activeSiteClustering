@@ -237,7 +237,7 @@ def shortest_centroid_dist(active_sites,labels):
 def merge(clusters, labels):
     """
     Input: List of two cluster labels and list of all labels
-    Output: List of labels, with tuple-specified ones merged
+    Output: List of labels, with specified ones merged
     """
         
     #arbitrarily merge first INTO second (so that first label no longer exists)
