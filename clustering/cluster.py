@@ -34,7 +34,7 @@ def k_means(active_sites,num_clusters,max_iters,dist_thresh):
     
     # initialize centroids randomly by choosing X random points
     seed()
-    inds = np.random.choice(len(activeSites),num_clusters,replace=False)
+    inds = np.random.choice(len(active_sites),num_clusters,replace=False)
     cluster_centers = np.array([active_sites[i].get_norm_metrics() for i in inds])
     
     # init trackers
