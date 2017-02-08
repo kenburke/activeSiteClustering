@@ -34,8 +34,12 @@ def k_means(active_sites,num_clusters,num_iters):
     
     # initialize centroids randomly by choosing X random points
     seed()
+    rand1 = round(random()*len(active_sites))
+    rand2 = round(random()*len(active_sites))
     
     
+    
+    cluster_centers = 0
     
     return cluster_centers
     
