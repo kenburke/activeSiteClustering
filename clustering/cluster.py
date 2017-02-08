@@ -2,6 +2,7 @@ from .utils import Atom, Residue, ActiveSite
 from .io import read_active_sites
 import numpy as np
 from random import seed
+from itertools import combinations as combo
 
 ###########################
 # Clustering By Partition #
@@ -146,12 +147,12 @@ def cluster_hierarchically(active_sites,num_clusters=3):
             (each clustering is a list of lists of ActiveSite instances)
     """
 
-    labels, cluster_centers = centroid_linkage(active_sites,num_clusters)
+    labels = centroid_linkage(active_sites,num_clusters)
     
     clustering = []
     
-    for clust in range(num_clusters):
-        clustering.append([active_sites[i] for i in range(len(labels)) if labels[i]==clust])
+    for clust in np.unique(labels):
+        clustering.append([active_sites[ind] for ind,val in enumerate(labels.tolist() )if val==clust])
     
     return clustering
 
@@ -164,10 +165,9 @@ def centroid_linkage(active_sites,min_clusters,printMe=False):
     Inputs: List of ActiveSite instances and number of clusters 
     Outputs: List of labels and cluster centers
     """
-    
+        
     # edge cases
     min_clusters = round(min_clusters)
-    max_iters = round(max_iters)
     if printMe:
         print('------')
     if min_clusters>len(active_sites) or min_clusters<1:
@@ -181,61 +181,63 @@ def centroid_linkage(active_sites,min_clusters,printMe=False):
     # initialize variables
     num_clusters = len(active_sites)
     labels = np.arange(len(active_sites))
+    np.random.shuffle(labels)
        
     # begin algorithm
-    
     while num_clusters > min_clusters:
         
         #calculate the centroid of each cluster and find the smallest distance
         clusters = shortest_centroid_dist(active_sites,labels)
-        
         #merge the two clusters
         labels = merge(clusters,labels)
         num_clusters -= 1
-    
+        
+        if num_clusters%10==0:
+            print('Number of Clusters:',num_clusters)
+        
     return labels
 
 def shortest_centroid_dist(active_sites,labels):
     """
     Input: List of active_sites and labels
-    Output: Tuple of two cluster labels that are closest
+    Output: List of two cluster labels that are closest
     """
     
     # find unique values in labels and their indices
     
-    u, ind = np.unique(labels,return_inverse=True)
-    
+    u, u_ind = np.unique(labels,return_inverse=True)
+
     # go through all unique pairwise combinations of labels
     # and test the distances between centroids
     
     shortest = 1000000000
-    closest_clusters = (0,0)
+    closest_clusters = [0,0]
     
     for i,j in combo(u,2):
-        # get metrics from all sites in matrix for each one
-        inds_i = [ind for ind,val in enumerate(u.tolist()) if val==i]
+        # get metrics from all sites for each cluster pair
+        inds_i = [ind for ind,val in enumerate(labels.tolist()) if val==i]
         metrics_i = np.array([active_sites[k].get_norm_metrics() for k in inds_i])   
          
-        inds_j = [ind for ind,val in enumerate(u.tolist()) if val==j]
-        metrics_j = np.array([active_sites[k].get_norm_metrics() for k in inds_j])    
+        inds_j = [ind for ind,val in enumerate(labels.tolist()) if val==j]
+        metrics_j = np.array([active_sites[m].get_norm_metrics() for m in inds_j])    
         
         # measure distance between centroids and update if necessary
         dist = np.linalg.norm(metrics_j.mean(axis=0)-metrics_i.mean(axis=0))
-        
+
         if dist < shortest:
             shortest = dist
-            closest_clusters = (i,j)
-            
+            closest_clusters = [i,j]
+                        
     return closest_clusters
 
     
 def merge(clusters, labels):
     """
-    Input: Tuple of two cluster labels and list of all labels
+    Input: List of two cluster labels and list of all labels
     Output: List of labels, with tuple-specified ones merged
     """
-    
-    return
-
-
-
+        
+    #arbitrarily merge first INTO second (so that first label no longer exists)
+    labels[labels==clusters[0]] = clusters[1]
+        
+    return labels
