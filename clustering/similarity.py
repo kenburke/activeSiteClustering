@@ -1,7 +1,5 @@
 from .utils import Atom, Residue, ActiveSite
 import numpy as np
-from itertools import combinations as combo
-from copy import deepcopy
 
 def compute_similarity(site_a, site_b, redo_mean_dev=False):
     """

@@ -3,6 +3,11 @@ from .io import read_active_sites
 import numpy as np
 from random import seed
 
+###########################
+# Clustering By Partition #
+###########################
+
+
 def cluster_by_partitioning(active_sites,num_clusters=3, max_iters=10000, dist_thresh=0.001):
     """
     Cluster a given set of ActiveSite instances using a partitioning method.
@@ -14,7 +19,7 @@ def cluster_by_partitioning(active_sites,num_clusters=3, max_iters=10000, dist_t
             ActiveSite instances)
     """
     
-    labels, cluster_centers = k_means(active_sites,num_clusters,max_iters,dist_thresh)
+    labels = k_means(active_sites,num_clusters,max_iters,dist_thresh)
     
     clustering = []
     
@@ -27,7 +32,7 @@ def k_means(active_sites,num_clusters,max_iters,dist_thresh,printMe=False):
     """
     K-Means clustering
     
-    Input: List of active site instances, number of clusters and number of iterations
+    Input: List of active site instances, number of clusters, number of iters and tresh
     Output: List of labels and cluster centers as numpy arrays
     """
     
@@ -38,8 +43,8 @@ def k_means(active_sites,num_clusters,max_iters,dist_thresh,printMe=False):
         print('------')
     if num_clusters>len(active_sites) or num_clusters<1:
         if printMe:
-            print("Invalid number of clusters: Default to 5")
-        num_clusters = 5
+            print("Invalid number of clusters: Default to 3")
+        num_clusters = 3
     else:
         if printMe:
             print('Number of Clusters:',num_clusters)
@@ -75,7 +80,7 @@ def k_means(active_sites,num_clusters,max_iters,dist_thresh,printMe=False):
     if printMe:
         print('Total iterations:',iter,'\n')    
     
-    return labels, cluster_centers
+    return labels
 
 def distance_cutoff(prev,current,thresh,printMe):
     """
@@ -127,15 +132,110 @@ def update_cluster_locs(active_sites, labels, num_clusters):
     
     return new_cluster_centers
 
-def cluster_hierarchically(active_sites):
+###########################
+# Hierarchical Clustering #
+###########################
+
+def cluster_hierarchically(active_sites,num_clusters=3):
     """
     Cluster the given set of ActiveSite instances using a hierarchical algorithm.
 
     Input: a list of ActiveSite instances
+    (OPTIONAL): number of clusters (default 3)
     Output: a list of clusterings
-            (each clustering is a list of lists of Sequence objects)
+            (each clustering is a list of lists of ActiveSite instances)
     """
 
-    # Fill in your code here!
+    labels, cluster_centers = centroid_linkage(active_sites,num_clusters)
+    
+    clustering = []
+    
+    for clust in range(num_clusters):
+        clustering.append([active_sites[i] for i in range(len(labels)) if labels[i]==clust])
+    
+    return clustering
 
-    return []
+def centroid_linkage(active_sites,min_clusters,printMe=False):
+    """
+    Centroid Linkage clustering
+    
+    This implementation builds until it hits min_clusters. Dendrograms not supported.
+    
+    Inputs: List of ActiveSite instances and number of clusters 
+    Outputs: List of labels and cluster centers
+    """
+    
+    # edge cases
+    min_clusters = round(min_clusters)
+    max_iters = round(max_iters)
+    if printMe:
+        print('------')
+    if min_clusters>len(active_sites) or min_clusters<1:
+        if printMe:
+            print("Invalid number of clusters: Default to 3")
+        min_clusters = 3
+    else:
+        if printMe:
+            print('Target Number of Clusters:',min_clusters)
+         
+    # initialize variables
+    num_clusters = len(active_sites)
+    labels = np.arange(len(active_sites))
+       
+    # begin algorithm
+    
+    while num_clusters > min_clusters:
+        
+        #calculate the centroid of each cluster and find the smallest distance
+        clusters = shortest_centroid_dist(active_sites,labels)
+        
+        #merge the two clusters
+        labels = merge(clusters,labels)
+        num_clusters -= 1
+    
+    return labels
+
+def shortest_centroid_dist(active_sites,labels):
+    """
+    Input: List of active_sites and labels
+    Output: Tuple of two cluster labels that are closest
+    """
+    
+    # find unique values in labels and their indices
+    
+    u, ind = np.unique(labels,return_inverse=True)
+    
+    # go through all unique pairwise combinations of labels
+    # and test the distances between centroids
+    
+    shortest = 1000000000
+    closest_clusters = (0,0)
+    
+    for i,j in combo(u,2):
+        # get metrics from all sites in matrix for each one
+        inds_i = [ind for ind,val in enumerate(u.tolist()) if val==i]
+        metrics_i = np.array([active_sites[k].get_norm_metrics() for k in inds_i])   
+         
+        inds_j = [ind for ind,val in enumerate(u.tolist()) if val==j]
+        metrics_j = np.array([active_sites[k].get_norm_metrics() for k in inds_j])    
+        
+        # measure distance between centroids and update if necessary
+        dist = np.linalg.norm(metrics_j.mean(axis=0)-metrics_i.mean(axis=0))
+        
+        if dist < shortest:
+            shortest = dist
+            closest_clusters = (i,j)
+            
+    return closest_clusters
+
+    
+def merge(clusters, labels):
+    """
+    Input: Tuple of two cluster labels and list of all labels
+    Output: List of labels, with tuple-specified ones merged
+    """
+    
+    return
+
+
+
