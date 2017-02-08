@@ -3,7 +3,7 @@ from .io import read_active_sites
 import numpy as np
 from random import seed
 
-def cluster_by_partitioning(active_sites,num_clusters=5, max_iters=10000, dist_thresh=0.01):
+def cluster_by_partitioning(active_sites,num_clusters=3, max_iters=10000, dist_thresh=0.01):
     """
     Cluster a given set of ActiveSite instances using a partitioning method.
 
@@ -39,33 +39,70 @@ def k_means(active_sites,num_clusters,max_iters,dist_thresh):
     
     # init trackers
     iter = 0
-    labels = np.zeros([len(active_sites)])    
     prev_centers = np.zeros(cluster_centers.shape)
     
     # begin algorithm
     while not iter > max_iters and not distance_cutoff(prev_centers,cluster_centers,dist_thresh):
         prev_centers = cluster_centers
         iter += 1
+        if iter%1000==0:
+            print("Iteration no.", iter)
         
         #assign all objects to a cluster, then reevaluate cluster centers
         labels = assign_to_clusters(active_sites,cluster_centers)
-        cluster_centers = evaluate_cluster_locs(active_sites, labels, num_clusters)
+        cluster_centers = update_cluster_locs(active_sites, labels, num_clusters)
+    
         
     return cluster_centers
 
 def distance_cutoff(prev,current,thresh):
     """
     Input: numpy arrays of previous/current centroid locations, and threshold
-    Output: boolean of whether centroids have moved farther than the threshold
+    Output: boolean of whether centroids have moved farther than the threshold on average
     """
     
+    sum = 0
     
+    for i in range(prev.shape[0]):
+        sum += np.linalg.norm(prev[i,:] - current[i,:])
+    
+    sum /= prev.shape[0]
+    
+    if sum < thresh:
+        print("Threshold reached, mean center distance travelled is ", sum)
+    
+    return sum < thresh
     
         
-def assign_to_clusters():
+def assign_to_clusters(active_sites,cluster_centers):
+    """
+    Input: List of ActiveSite instances, and 2D numpy array of cluster centers
+    Output: List of labels, value is the row (cluster) that Site was assigned to.
+    """
+    
+    labels = np.zeros([len(active_sites)])  
+    
+    for i in range(len(active_sites)):
+        site_metrics = active_sites[i].get_norm_metrics()
+        cluster_matches = np.sqrt(((cluster_centers - site_metrics)**2).sum(axis=1))
+        labels[i] = np.argmax(cluster_matches)
+        
+    return labels
 
-def evaluate_cluster_locs():
-
+def update_cluster_locs(active_sites, labels, num_clusters):
+    """
+    Input: List of ActiveSite instances and labels, and the number of clusters
+    Output: Numpy array of new cluster centers
+    """
+    
+    new_cluster_centers = np.zeros(shape=(num_clusters,len(active_sites[0].get_norm_metrics())))
+    
+    # for each cluster, get all assigned sites and average their metrics
+    for clust in range(num_clusters):
+        site_inds = [ind for ind,val in enumerate(labels) if val==clust]
+        all_clust_metrics = np.array([active_sites[i].get_norm_metrics() for i in site_inds])
+        new_center = all_clust_metrics.mean(axis=0)
+        new_cluster_centers[clust,:] = new_center
 
 def cluster_hierarchically(active_sites):
     """
