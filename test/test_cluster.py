@@ -1,6 +1,7 @@
 from clustering import cluster, io, similarity
 import os
 from random import random, seed
+from math import floor
 import pytest
 
 
@@ -21,11 +22,11 @@ def test_similarity(sites):
     
     # get random sites from activeSites    
     seed()
-    rand1 = round(random()*len(activeSites))
-    rand2 = round(random()*len(activeSites))
+    rand1 = floor(random()*len(activeSites))
+    rand2 = floor(random()*len(activeSites))
     
     while rand2 == rand1:
-        rand2 = round(random()*len(activeSites))
+        rand2 = floor(random()*len(activeSites))
 
     #Range
     sim_y = similarity.compute_similarity(activeSites[rand1], activeSites[rand2])
