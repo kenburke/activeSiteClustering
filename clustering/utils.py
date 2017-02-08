@@ -99,9 +99,9 @@ class ActiveSite:
     
         atom_type = {"C":0,"N":0,"O":0}
     
-        metric_names = ['meanChar','varChar','meanPol','varPol',
-            'elemFracC','elemFracN','elemFracO','numAtoms','numRes','meanResDist','varResDist', 
-            'nonpolarFrac','polarFrac','acidicFrac','basicFrac']
+        metric_names = ['meanChar','varChar','meanPol',
+            'elemFracC','numAtoms','numRes','meanResDist','varResDist', 
+            'nonpolarFrac','acidicFrac','basicFrac']
     
         metrics = dict.fromkeys(metric_names)
     
@@ -119,13 +119,13 @@ class ActiveSite:
             res_type[key] /= numRes
         
         self._update_dict(metrics,
-            ('meanChar','varChar','meanPol','varPol','nonpolarFrac','polarFrac','acidicFrac','basicFrac'),
+            ('meanChar','varChar','meanPol','nonpolarFrac','acidicFrac','basicFrac'),
             (np.mean(residue_charge),np.var(residue_charge),
-                np.mean(residue_polarity),np.var(residue_polarity),
-                res_type['nonpolar'],res_type['polar'],res_type['acidic'],res_type['basic'])
+                np.mean(residue_polarity),res_type['nonpolar'],
+                res_type['acidic'],res_type['basic'])
             )
       
-        #now calculate the fraction of atoms of carbon/nitrogen/oxygen in the active zone
+        #now calculate the fraction of atoms of carbon in the active zone
         numAtoms = 0
         
         for residue in self.residues:
@@ -134,17 +134,13 @@ class ActiveSite:
                 type = atom.type[0]
                 if type.lower()=='c':
                     atom_type['C'] += 1
-                elif type.lower()=='n':
-                    atom_type['N'] += 1
-                elif type.lower()=='o':
-                    atom_type['O'] += 1
     
         for key in atom_type.keys():
             atom_type[key] /= numAtoms
     
         self._update_dict(metrics,
-            ('elemFracC','elemFracN','elemFracO','numAtoms','numRes'),
-            (atom_type['C'],atom_type['N'],atom_type['O'],numAtoms,numRes)
+            ('elemFracC','numAtoms','numRes'),
+            (atom_type['C'],numAtoms,numRes)
             )
     
         #now calculate the "center of mass" for each residue.
@@ -228,9 +224,9 @@ def flatten_metrics(metrics_dict):
     #NOTE: When converting into array, follows the metric_names list
     #so that you can consistently compare numpy arrays element-wise
 
-    metric_names = ['meanChar','varChar','meanPol','varPol',
-        'elemFracC','elemFracN','elemFracO','numAtoms','numRes','meanResDist','varResDist', 
-        'nonpolarFrac','polarFrac','acidicFrac','basicFrac']
+    metric_names = ['meanChar','varChar','meanPol',
+        'elemFracC','numAtoms','numRes','meanResDist','varResDist', 
+        'nonpolarFrac','acidicFrac','basicFrac']
 
     metric_arr = np.ndarray(0)
 

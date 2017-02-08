@@ -28,7 +28,7 @@ def k_means(active_sites,num_clusters,max_iters,dist_thresh):
     # edge cases
     num_clusters = round(num_clusters)
     max_iters = round(max_iters)
-    if num_clusters>len(active_sites) or numclusters<1:
+    if num_clusters>len(active_sites) or num_clusters<1:
         print("Invalid number of clusters: Default to 5")
         num_clusters = 5
     
