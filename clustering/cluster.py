@@ -36,7 +36,8 @@ def k_means(active_sites,num_clusters,max_iters,dist_thresh,printMe=False):
     Input: List of active site instances, number of clusters, number of iters and tresh
     Output: List of labels and cluster centers as numpy arrays
     """
-    
+    seed()
+
     # edge cases
     num_clusters = round(num_clusters)
     max_iters = round(max_iters)
@@ -51,7 +52,6 @@ def k_means(active_sites,num_clusters,max_iters,dist_thresh,printMe=False):
             print('Number of Clusters:',num_clusters)
     
     # initialize centroids randomly by choosing X random points
-    seed()
     iter = 0
     inds = np.random.choice(len(active_sites),num_clusters,replace=False)
     cluster_centers = np.array([active_sites[i].get_norm_metrics() for i in inds])
@@ -165,6 +165,8 @@ def centroid_linkage(active_sites,min_clusters,printMe=False):
     Inputs: List of ActiveSite instances and number of clusters 
     Outputs: List of labels and cluster centers
     """
+    
+    seed()
         
     # edge cases
     min_clusters = round(min_clusters)

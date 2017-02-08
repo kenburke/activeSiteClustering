@@ -62,7 +62,6 @@ def test_similarity(sites):
 
 def test_partition_clustering():
     # tractable subset
-#    pdb_ids = [276, 3733, 4629, 42296, 70919] # two clusters, first two and last one alone
     pdb_ids = [276, 4629, 10701]
 
     active_sites = []
@@ -90,5 +89,16 @@ def test_hierarchical_clustering():
         filepath = os.path.join("data", "%i.pdb"%id)
         active_sites.append(io.read_active_site(filepath))
 
-    # update this assertion
-    assert cluster.cluster_hierarchically(active_sites) == []
+    # should match two clusters appropriately
+    # cluster number is random, so check membership
+    # (should be deterministic, unlike k-means implementation for partitioning,
+    #  so multiple rounds shouldn't matter, but test anyways)
+    
+    for i in range(10):
+        c = cluster.cluster_hierarchically(active_sites,num_clusters=2) 
+    
+        sub_cluster = [x for x in c if active_sites[0] in x]        #this finds subcluster with 276
+    
+        assert active_sites[0] in sub_cluster[0] and active_sites[1] in sub_cluster[0]
+        assert active_sites[2] not in sub_cluster[0]
+
