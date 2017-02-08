@@ -10,7 +10,7 @@ from math import log
 ###########################
 
 
-def cluster_by_partitioning(active_sites,num_clusters=3, max_iters=10000, dist_thresh=0.001):
+def cluster_by_partitioning(active_sites,num_clusters=7, max_iters=10000, dist_thresh=0.001):
     """
     Cluster a given set of ActiveSite instances using a partitioning method.
 
@@ -46,8 +46,8 @@ def k_means(active_sites,num_clusters,max_iters,dist_thresh,printMe=False):
         print('------')
     if num_clusters>len(active_sites) or num_clusters<1:
         if printMe:
-            print("Invalid number of clusters: Default to 3")
-        num_clusters = 3
+            print("Invalid number of clusters: Default to 7")
+        num_clusters = 7
     else:
         if printMe:
             print('Number of Clusters:',num_clusters)
@@ -138,12 +138,12 @@ def update_cluster_locs(active_sites, labels, num_clusters):
 # Hierarchical Clustering #
 ###########################
 
-def cluster_hierarchically(active_sites,num_clusters=3):
+def cluster_hierarchically(active_sites,num_clusters=7):
     """
     Cluster the given set of ActiveSite instances using a hierarchical algorithm.
 
     Input: a list of ActiveSite instances
-    (OPTIONAL): number of clusters (default 3)
+    (OPTIONAL): number of clusters (default 7)
     Output: a list of clusterings
             (each clustering is a list of lists of ActiveSite instances)
     """
@@ -175,8 +175,8 @@ def centroid_linkage(active_sites,min_clusters,printMe=False):
         print('------')
     if min_clusters>len(active_sites) or min_clusters<1:
         if printMe:
-            print("Invalid number of clusters: Default to 3")
-        min_clusters = 3
+            print("Invalid number of clusters: Default to 7")
+        min_clusters = 7
     else:
         if printMe:
             print('Target Number of Clusters:',min_clusters)
