@@ -99,13 +99,13 @@ class ActiveSite:
     
         atom_type = {"C":0,"N":0,"O":0}
     
-        metric_names = ['meanChar','varChar','meanPol',
-            'elemFracC','numAtoms','numRes','meanResDist','varResDist', 
+        metric_names = ['meanChar','meanPol','elemFracC',
+            'numAtoms','numRes','meanResDist',
             'nonpolarFrac','acidicFrac','basicFrac']
     
         metrics = dict.fromkeys(metric_names)
     
-        #first calculate mean and variance of total charges/polarity of residues
+        #first calculate mean of total charges/polarity of residues
         residue_charge = np.ndarray(0)
         residue_polarity = np.ndarray(0)
         numRes = len(self.residues)
@@ -119,9 +119,8 @@ class ActiveSite:
             res_type[key] /= numRes
         
         self._update_dict(metrics,
-            ('meanChar','varChar','meanPol','nonpolarFrac','acidicFrac','basicFrac'),
-            (np.mean(residue_charge),np.var(residue_charge),
-                np.mean(residue_polarity),res_type['nonpolar'],
+            ('meanChar','meanPol','nonpolarFrac','acidicFrac','basicFrac'),
+            (np.mean(residue_charge), np.mean(residue_polarity),res_type['nonpolar'],
                 res_type['acidic'],res_type['basic'])
             )
       
@@ -144,7 +143,7 @@ class ActiveSite:
             )
     
         #now calculate the "center of mass" for each residue.
-        #then calculate the mean/var of the pairwise Euclidean distance between residue COMs.  
+        #then calculate the mean of the pairwise Euclidean distance between residue COMs.  
 
         for residue in self.residues:
             numAtoms = 0
@@ -165,10 +164,7 @@ class ActiveSite:
             distance = np.linalg.norm(np.asarray(pair[0].com)-np.asarray(pair[1].com))
             residue_dist.append(distance)  
        
-        self._update_dict(metrics,
-            ('meanResDist','varResDist'),
-            (np.mean(residue_dist),np.var(residue_dist))
-            )
+        metrics['meanResDist'] = np.mean(residue_dist)
     
         if printMe:    
             for metric in metrics.keys():
@@ -224,8 +220,8 @@ def flatten_metrics(metrics_dict):
     #NOTE: When converting into array, follows the metric_names list
     #so that you can consistently compare numpy arrays element-wise
 
-    metric_names = ['meanChar','varChar','meanPol',
-        'elemFracC','numAtoms','numRes','meanResDist','varResDist', 
+    metric_names = ['meanChar','meanPol','elemFracC',
+        'numAtoms','numRes','meanResDist',
         'nonpolarFrac','acidicFrac','basicFrac']
 
     metric_arr = np.ndarray(0)

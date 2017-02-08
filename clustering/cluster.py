@@ -21,9 +21,9 @@ def cluster_by_partitioning(active_sites,num_clusters=3, max_iters=10000, dist_t
     for clust in range(num_clusters):
         clustering.append([active_sites[i] for i in range(len(labels)) if labels[i]==clust])
     
-    return clustering, labels
+    return clustering
     
-def k_means(active_sites,num_clusters,max_iters,dist_thresh):
+def k_means(active_sites,num_clusters,max_iters,dist_thresh,printMe=False):
     """
     K-Means clustering
     
@@ -34,12 +34,15 @@ def k_means(active_sites,num_clusters,max_iters,dist_thresh):
     # edge cases
     num_clusters = round(num_clusters)
     max_iters = round(max_iters)
-    print('------')
+    if printMe:
+        print('------')
     if num_clusters>len(active_sites) or num_clusters<1:
-        print("Invalid number of clusters: Default to 5")
+        if printMe:
+            print("Invalid number of clusters: Default to 5")
         num_clusters = 5
     else:
-        print('Number of Clusters:',num_clusters)
+        if printMe:
+            print('Number of Clusters:',num_clusters)
     
     # initialize centroids randomly by choosing X random points
     seed()
@@ -51,11 +54,14 @@ def k_means(active_sites,num_clusters,max_iters,dist_thresh):
     prev_centers = np.zeros(cluster_centers.shape)
 
     # begin algorithm
-    print('Maximum Iterations:',max_iters)
-    print('Distance Threshold:',dist_thresh)
-    print('------')
+    if printMe:
+        print('Maximum Iterations:',max_iters)
+        print('Distance Threshold:',dist_thresh)
+        print('------')
 
-    while not iter > max_iters and not distance_cutoff(prev_centers,cluster_centers,dist_thresh):
+    while not iter > max_iters and not distance_cutoff(
+        prev_centers,cluster_centers,dist_thresh,printMe
+        ):
                             
         prev_centers = cluster_centers
         iter += 1
@@ -66,11 +72,12 @@ def k_means(active_sites,num_clusters,max_iters,dist_thresh):
         labels = assign_to_clusters(active_sites,cluster_centers)
         cluster_centers = update_cluster_locs(active_sites, labels, num_clusters)
     
-    print('Total iterations:',iter,'\n')    
+    if printMe:
+        print('Total iterations:',iter,'\n')    
     
     return labels, cluster_centers
 
-def distance_cutoff(prev,current,thresh):
+def distance_cutoff(prev,current,thresh,printMe):
     """
     Input: numpy arrays of previous/current centroid locations, and threshold
     Output: boolean of whether centroids have moved farther than the threshold on average
@@ -83,7 +90,7 @@ def distance_cutoff(prev,current,thresh):
     
     sum /= prev.shape[0]
     
-    if sum < thresh:
+    if sum < thresh and printMe:
         print("Threshold reached, mean center distance travelled this step is ", sum)
     
     return sum < thresh    
